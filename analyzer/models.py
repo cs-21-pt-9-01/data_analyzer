@@ -1,6 +1,8 @@
 import csv
 from typing import List
 
+import numpy as np
+
 
 class RAPLZoneRow:
 
@@ -33,6 +35,9 @@ class RAPLData:
                 # if row is headers
                 if row[0] == 'zone':
                     continue
+                # dont need initial measurement
+                if int(float(row[1])) == 0:
+                    continue
                 self.rows.append(RAPLZoneRow(*row))
 
     def get_field_as_dict(self, attr: str) -> dict:
@@ -42,6 +47,18 @@ class RAPLData:
             return self._kwatt_hours()
         return {zone: [int(float(getattr(row, attr))) for row in self.rows if row.zone == zone]
                 for zone in self.get_zones()}
+
+    def get_zone_metric(self, attr: str, metric: str):
+        if metric == 'max':
+            return {zone: max(val) for zone, val in self.get_field_as_dict(attr).items()}
+        elif metric == 'min':
+            return {zone: min(val) for zone, val in self.get_field_as_dict(attr).items()}
+        elif metric == 'median':
+            return {zone: np.median(val) for zone, val in self.get_field_as_dict(attr).items()}
+        elif metric == 'mean':
+            return {zone: np.mean(val) for zone, val in self.get_field_as_dict(attr).items()}
+        elif metric == 'avg':
+            return {zone: np.average(val) for zone, val in self.get_field_as_dict(attr).items()}
 
     def get_zones(self) -> list:
         return list({row.zone for row in self.rows})
