@@ -1,5 +1,5 @@
 import csv
-from typing import List, Callable
+from typing import List, Callable, Optional, Dict
 
 import numpy as np
 
@@ -77,3 +77,129 @@ class RAPLData:
 
     def _kwatt_hours(self) -> dict:
         return {zone: [float(row.power_j) / 3600 / 1000 for row in self.rows if row.zone == zone] for zone in self.get_zones()}
+
+
+class AnalyzedData:
+
+    def __init__(self, name: str, data: List[RAPLData]):
+        self.name = name
+
+        self.run_metrics = [RAPLRunMetrics(d) for d in data]
+        self.run_data = [RAPLRunData(d) for d in data]
+        self.overall = RAPLOverallMetrics(self.run_metrics)
+
+    def to_json(self):
+        return {
+            'overall': self.overall.to_json(),
+            'run_metrics': [x.to_json() for x in self.run_metrics],
+            'run_data': [x.to_json() for x in self.run_data]
+        }
+
+
+class RAPLRunMetrics:
+
+    def __init__(self, data: RAPLData):
+        self.power_j = MetricData(data.get_field_as_dict('power_j', float), total=True, as_steps=True)
+        self.watts = MetricData(data.get_field_as_dict('watts', float))
+        self.watts_since_last = MetricData(data.get_field_as_dict('watts_since_last', float))
+        self.watt_h = MetricData(data.get_field_as_dict('watt_h', float), total=True, as_steps=True)
+        self.kwatt_h = MetricData(data.get_field_as_dict('kwatt_h', float), total=True, as_steps=True)
+
+    def to_json(self):
+        return {
+            'power_j': self.power_j.to_json(),
+            'watts': self.watts.to_json(),
+            'watts_since_last': self.watts_since_last.to_json(),
+            'watt_h': self.watt_h.to_json(),
+            'kwatt_h': self.kwatt_h.to_json(),
+        }
+
+
+class RAPLRunData:
+
+    def __init__(self, data: RAPLData):
+        self.power_j = data.get_field_as_dict('power_j', float)
+        self.watts = data.get_field_as_dict('watts', float)
+        self.watts_since_last = data.get_field_as_dict('watts_since_last', float)
+        self.watt_h = data.get_field_as_dict('watt_h', float)
+        self.kwatt_h = data.get_field_as_dict('kwatt_h', float)
+
+    def to_json(self):
+        return {
+            'power_j': self.power_j,
+            'watts': self.watts,
+            'watts_since_last': self.watts_since_last,
+            'watt_h': self.watt_h,
+            'kwatt_h': self.kwatt_h,
+        }
+
+
+class MetricData:
+
+    def __init__(self, data: Dict[str, list], as_steps: bool = False, total=False):
+        self.total = {zone: val[-1] for zone, val in
+                      data.items()} if total else None  # type: Optional[Dict[str, float]]
+
+        if as_steps:
+            steps = {}
+
+            for zone, val in data.items():
+                steps[zone] = []
+
+                for i in range(len(val)):
+                    if i + 1 >= len(val):
+                        continue
+                    steps[zone].append(val[i + 1] - val[i])
+
+            data = steps
+
+        self.min = {zone: min(val) for zone, val in data.items()}
+        self.max = {zone: max(val) for zone, val in data.items()}
+        self.median = {zone: np.median(val) for zone, val in data.items()}
+        self.mean = {zone: np.mean(val) for zone, val in data.items()}
+        self.avg = {zone: np.average(val) for zone, val in data.items()}
+
+    def to_json(self):
+        j = {
+            'min': self.min,
+            'max': self.max,
+            'median': self.median,
+            'mean': self.mean,
+            'avg': self.avg,
+        }
+
+        if self.total:
+            j['total'] = self.total
+
+        return j
+
+
+class RAPLOverallMetrics:
+
+    def __init__(self, data: List[RAPLRunMetrics]):
+        self.power_j = self._merge([x.power_j for x in data])
+        self.watts = self._merge([x.watts for x in data])
+        self.watts_since_last = self._merge([x.watts_since_last for x in data])
+        self.watt_h = self._merge([x.watt_h for x in data])
+        self.kwatt_h = self._merge([x.kwatt_h for x in data])
+
+    def to_json(self):
+        return {
+            'power_j': self.power_j,
+            'watts': self.watts,
+            'watts_since_last': self.watts_since_last,
+            'watt_h': self.watt_h,
+            'kwatt_h': self.kwatt_h,
+        }
+
+    @staticmethod
+    def _merge(data: List[MetricData]) -> Dict[str, dict]:
+        metrics = [('min', min), ('max', max), ('median', np.median), ('mean', np.mean),
+                   ('avg', np.average)]
+        zones = list(data[0].min.keys())
+        merged = {}
+
+        for m in metrics:
+            merged[m[0]] = {zone: m[1]([getattr(d, m[0])[zone] for d in data]) for zone in zones}
+
+        return merged
