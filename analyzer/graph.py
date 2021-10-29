@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 VALID_METRICS = ['min', 'max', 'median', 'avg', 'mean']
+GRAPH_TYPES = ['plot', 'bar']
 
 
 class GraphGenerator:
@@ -54,7 +55,7 @@ class GraphGenerator:
 
         legend = ax.legend(loc='lower left', bbox_to_anchor=(1, .8))
 
-        plt.savefig(f'{attr}_plot.png')
+        plt.savefig(f'{self.data.path.split(".")[0]}_{attr}_plot.png')
         plt.close(fig)
 
     def bar(self, attr: str, metric: str):
@@ -68,5 +69,5 @@ class GraphGenerator:
         ax.bar(data.keys(), data.values())
         ax.set_ylabel(f'Power ({attr})')
 
-        plt.savefig(f'{attr}_{metric}_bar.png')
+        plt.savefig(f'{self.data.path.split(".")[0]}_{attr}_{metric}_bar.png')
         plt.close(fig)
