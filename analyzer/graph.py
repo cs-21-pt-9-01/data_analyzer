@@ -32,6 +32,7 @@ class GraphGenerator:
 
         ax.bar(data.keys(), data.values())
         ax.set(xlabel=xlabel, ylabel=ylabel, title=title)
+        ax.grid()
 
         plt.savefig(fp)
         plt.close(fig)
