@@ -95,6 +95,20 @@ class AnalyzedData:
             'run_data': [x.to_json() for x in self.run_data]
         }
 
+    def collect_metrics_by_zone(self, attr: str, metric: str) -> dict:
+        res = {}
+        for m in self.run_metrics:
+            attr_obj = getattr(m, attr)
+            metric_obj = getattr(attr_obj, metric)
+
+            for zone, value in metric_obj.items():
+                if zone not in res:
+                    res[zone] = []
+
+                res[zone].append(value)
+
+        return res
+
 
 class RAPLRunMetrics:
 
