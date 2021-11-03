@@ -50,20 +50,6 @@ class RAPLData:
         return {zone: [_type(float(getattr(row, attr))) for row in self.rows if row.zone == zone]
                 for zone in self.get_zones()}
 
-    def get_zone_metric(self, attr: str, metric: str, _type: Callable = int):
-        if metric == 'max':
-            return {zone: max(val) for zone, val in self.get_field_as_dict(attr, _type).items()}
-        elif metric == 'min':
-            return {zone: min(val) for zone, val in self.get_field_as_dict(attr, _type).items()}
-        elif metric == 'median':
-            return {zone: np.median(val) for zone, val in self.get_field_as_dict(attr, _type).items()}
-        elif metric == 'mean':
-            return {zone: np.mean(val) for zone, val in self.get_field_as_dict(attr, _type).items()}
-        elif metric == 'avg':
-            return {zone: np.average(val) for zone, val in self.get_field_as_dict(attr, _type).items()}
-        elif metric == 'total':
-            return {zone: val[-1] for zone, val in self.get_field_as_dict(attr, _type).items()}
-
     def get_zones(self) -> list:
         return list({row.zone for row in self.rows})
 

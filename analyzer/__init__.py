@@ -3,7 +3,6 @@ from .full import full_run
 from .graph import GraphGenerator, VALID_METRICS, GRAPH_TYPES
 from .models import VALID_ATTRS
 
-import sys
 from argparse import ArgumentParser
 
 parser = ArgumentParser(description="RAPL data analyzer")

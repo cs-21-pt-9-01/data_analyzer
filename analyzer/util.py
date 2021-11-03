@@ -1,7 +1,6 @@
 from .models import RAPLData
 
 import os
-import math
 from typing import List
 
 
@@ -28,7 +27,3 @@ def parse_input_paths(paths: List[str]) -> List[RAPLData]:
             print(f'Warning: {path} is not a valid file or directory, skipping..')
 
     return res
-
-
-def round_to_nearest(num: int, to: int):
-    return math.ceil(num / to) * to
