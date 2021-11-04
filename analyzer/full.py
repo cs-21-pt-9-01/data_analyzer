@@ -9,7 +9,9 @@ import numpy as np
 
 
 def full_run(_dir: str):
+    print('Parsing input dir')
     data = _parse_input(_dir)
+    print('Parsing data')
     res = [AnalyzedData(bench_name, bench_data) for bench_name, bench_data in data.items()]
     graph = GraphGenerator()
 
@@ -19,9 +21,11 @@ def full_run(_dir: str):
         if not os.path.isdir(path):
             os.makedirs(path)
 
+        print(f'Writing {r.name} JSON')
         with open(f'{path}/{r.name}.json', 'w') as f:
             f.write(json.dumps(r.to_json(), indent=4))
 
+        print(f'Generating {r.name} graphs')
         power_j_total = r.collect_metrics_by_zone('power_j', 'total')
 
         x = list(range(1, len(r.run_metrics) + 1))
@@ -29,6 +33,8 @@ def full_run(_dir: str):
 
         graph.bar({zone: np.average(value) for zone, value in power_j_total.items()},
                   f'{path}/power_j_overall_avg', f'Power (Joules, avg - {len(r.run_metrics)} runs)', 'RAPL Zone', r.name)
+
+    print('Done')
 
 
 def _parse_input(_dir: str) -> dict:
