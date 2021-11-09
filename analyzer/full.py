@@ -33,10 +33,10 @@ def full_run(_dir: str):
             power_j_total = r.collect_metrics_by_zone('power_j', 'total')
 
             x = list(range(1, len(r.run_metrics) + 1))
-            graph.plot(power_j_total, x, f'{path}/power_j_total.png', 'Power (Joules)', r.name)
+            graph.plot(power_j_total, x, f'{path}/power_j_total.png', 'Power (Joules)', r.name.split('/')[-1])
 
             graph.bar({zone: np.average(value) for zone, value in power_j_total.items()},
-                      f'{path}/power_j_overall_avg', f'Power (Joules, avg - {len(r.run_metrics)} runs)', 'RAPL Zone', r.name)
+                      f'{path}/power_j_overall_avg', f'Power (Joules, avg - {len(r.run_metrics)} runs)', 'RAPL Zone', r.name.split('/')[-1])
 
     print('Done')
 
