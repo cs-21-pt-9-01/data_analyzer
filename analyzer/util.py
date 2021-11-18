@@ -27,3 +27,7 @@ def parse_input_paths(paths: List[str]) -> List[RAPLData]:
             print(f'Warning: {path} is not a valid file or directory, skipping..')
 
     return res
+
+
+def parse_input(_dir: str) -> dict:
+    return {_dir: parse_input_paths([_dir])}

@@ -14,7 +14,7 @@ def full_run(_dir: str):
     for _d in os.listdir(_dir):
         d = f'{_dir}/{_d}'
         print(f'Parsing dir {d}')
-        data = _parse_input(d)
+        data = util.parse_input(d)
         print('Parsing data')
         res = [AnalyzedData(bench_name, bench_data) for bench_name, bench_data in data.items()]
         del data
@@ -41,6 +41,4 @@ def full_run(_dir: str):
     print('Done')
 
 
-def _parse_input(_dir: str) -> dict:
-    return {_dir: util.parse_input_paths([_dir])}
 
