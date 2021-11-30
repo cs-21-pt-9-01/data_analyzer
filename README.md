@@ -1,5 +1,33 @@
 # RAPL data analysis
 
+```
+usage: run.py [-h] --input files | dirs --graph {grouped_barchart,power_j_total,power_j_avg} [--output OUTPUT] [--title TITLE]
+
+RAPL data analyzer
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --input file(s) | dir(s)
+                        Input file(s) and/or dir(s) containing RAPL data
+  --graph {grouped_barchart,power_j_total,power_j_avg}
+                        Name of the graph to output
+  --output OUTPUT       Output file
+  --title TITLE         Title of the plot created
+```
+
+
+## Input
+```
+<input_dir>/<benchmark>/<data>
+```
+Where
+* `<input_dir>` is the parent directory
+* `<benchmark>` is the benchmark name
+* `<data>` is all of the data. Only loads `.csv`-files from this directory
+
+
+
+
 ## Data processing
 The data analyzer accepts nested directories containing csv files as defined by [cs-21-pt-9-01/rapl.rs#csv-output](https://github.com/cs-21-pt-9-01/rapl.rs#csv-output) as input.
 
