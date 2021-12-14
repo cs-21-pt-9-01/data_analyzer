@@ -41,18 +41,20 @@ def groupbar(data: dict, title: str, output_file: str):
     benchmarks = data['labels']
     max_index = len(benchmarks)
 
+    # x = numpy array: [0, 1, 2, 3 ... max_index]
     x = np.arange(max_index)
     width = 0.20
 
     fig, ax = plt.subplots()
     rects = []
     index = 0
-    offset = 0
-    if max_index % 2 == 0:
-        offset = width * 0.5
+    offset = len(column_order) / 2 - 1
+    if len(column_order) % 2 == 0:
+        offset += .5
+
     for name in column_order:
         result = data['results'][name]
-        x_pos = x + index * width - max_index / 2 * width + offset + width
+        x_pos = x + index * width - offset * width
         r = ax.bar(x_pos, result['mean'], width, yerr=result['std'], label=name)
         rects.append(r)
         index += 1
@@ -67,6 +69,7 @@ def groupbar(data: dict, title: str, output_file: str):
     #    ax.bar_label(r, padding=3)
 
     fig.tight_layout()
+    fig.autofmt_xdate()
 
     plt.savefig(output_file)
     plt.close(fig)

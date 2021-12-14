@@ -6,6 +6,23 @@ from .plot import groupbar
 from decimal import *
 import numpy as np
 
+def translate_name(name):
+  if name == 'chocolate-doom':
+    return 'chocolate-doom (c)'
+  elif name == 'crispy-doom':
+    return 'crispy-doom (c)'
+  elif name == 'eternity':
+    return 'eternity (c++)'
+  elif name == 'managed-doom':
+    return 'managed-doom (c#)'
+  elif name == 'mochadoom':
+    return 'mochadoom (java)'
+  elif name == 'prboom-opengl':
+    return 'prboom+ opengl (c)'
+  elif name == 'prboom-software' :
+    return 'prboom+ software (c)'
+  else:
+    return 'Unknown'
 
 def grouped_barchart_run(_input: str, output_file: str, title: str):
   overall_data = dict()
@@ -40,7 +57,8 @@ def grouped_barchart_run(_input: str, output_file: str, title: str):
           zones[row.zone] = current_power
           if row.zone == 'package-0':
             zones['time'] = Decimal(row.time_elapsed)
-      # From the max, save the value to data variable 
+            zones['temperature'] = Decimal(row.temperature)
+      # From the max, save the value to data variable
       for zone, max_value in zones.items():
         if zone not in data[benchmark]:
           data[benchmark][zone] = list()
@@ -57,6 +75,7 @@ def grouped_barchart_run(_input: str, output_file: str, title: str):
       data['results'][zone]['cnt'].append(len(values))
       del data[benchmark][zone]
     del data[benchmark]
+  data['labels'] = [translate_name(n) for n in data['labels']]
   import pprint
   pprint.pprint(data)
   groupbar(data, title, output_file)
