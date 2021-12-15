@@ -17,6 +17,8 @@ def translate_name(name):
     return 'managed-doom (c#)'
   elif name == 'mochadoom':
     return 'mochadoom (java)'
+  elif name == 'mochadoom-fix':
+    return 'mochadoom CT+'
   elif name == 'prboom-opengl':
     return 'prboom+ opengl (c)'
   elif name == 'prboom-software' :
