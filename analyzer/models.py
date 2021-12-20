@@ -10,7 +10,7 @@ class RAPLZoneRow:
 
     def __init__(self, zone: str, time_elapsed: float, power_j: float, watts: float,
                  watts_since_last: float, start_power: float, prev_power: float,
-                 prev_power_reading: float):
+                 prev_power_reading: float, temperature: float):
         self.zone = zone
         self.time_elapsed = time_elapsed
         self.power_j = power_j
@@ -19,6 +19,7 @@ class RAPLZoneRow:
         self.start_power = start_power
         self.prev_power = prev_power
         self.prev_power_reading = prev_power_reading
+        self.temperature = temperature
 
 
 class RAPLData:

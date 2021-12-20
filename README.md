@@ -1,5 +1,33 @@
 # RAPL data analysis
 
+```
+usage: run.py [-h] --input files | dirs --graph {grouped_barchart,power_j_total,power_j_avg} [--output OUTPUT] [--title TITLE]
+
+RAPL data analyzer
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --input file(s) | dir(s)
+                        Input file(s) and/or dir(s) containing RAPL data
+  --graph {grouped_barchart,power_j_total,power_j_avg}
+                        Name of the graph to output
+  --output OUTPUT       Output file
+  --title TITLE         Title of the plot created
+```
+
+
+## Input
+```
+<input_dir>/<benchmark>/<data>
+```
+Where
+* `<input_dir>` is the parent directory
+* `<benchmark>` is the benchmark name
+* `<data>` is all of the data. Only loads `.csv`-files from this directory
+
+
+
+
 ## Data processing
 The data analyzer accepts nested directories containing csv files as defined by [cs-21-pt-9-01/rapl.rs#csv-output](https://github.com/cs-21-pt-9-01/rapl.rs#csv-output) as input.
 
@@ -63,3 +91,26 @@ A full example can be seen here: [cs-21-pt-9-01/benchmark_data](https://github.c
 ## Graphs
 
 See `./sample/` for examples
+
+## Commands used for the project
+The following commands were used in the project to generate the graphs:
+```bash
+python run.py --input ~/code/benchmark_data/data-software --graph grouped_barchart --output doom_software.png --title "Energy consumption with software rendering"
+```
+
+```bash
+python run.py --input ~/code/benchmark_data/data-software2 --graph grouped_barchart --output doom_software2.png --title "Energy consumption with software rendering"
+```
+
+```bash
+python run.py --input ~/code/benchmark_data/data-uncapped --graph grouped_barchart --output doom_uncapped.png --title "Energy consumption with uncapped framelimiter"
+```
+
+```bash
+python run.py --input ~/code/benchmark_data/data-hardware --graph grouped_barchart --output doom_hardware.png --title "Energy consum
+ption with hardware acceleration"
+```
+
+```bash
+python run.py --input ~/code/benchmark_data/mochadoom-fix-results --graph grouped_barchart --output mochadoom_fix.png --title "Energy consumption in mochadoom"
+```

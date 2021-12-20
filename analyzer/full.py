@@ -1,6 +1,6 @@
 from .models import AnalyzedData
-from .graph import GraphGenerator
-from . import util
+from .plot import plot, bar
+from .parser import parse_input_paths
 
 import os
 import json
@@ -8,8 +8,7 @@ import json
 import numpy as np
 
 
-def full_run(_dir: str):
-    graph = GraphGenerator()
+def full_run(_dir: str, plot_type: str):
 
     for _d in os.listdir(_dir):
         d = f'{_dir}/{_d}'
@@ -33,14 +32,15 @@ def full_run(_dir: str):
             power_j_total = r.collect_metrics_by_zone('power_j', 'total')
 
             x = list(range(1, len(r.run_metrics) + 1))
-            graph.plot(power_j_total, x, f'{path}/power_j_total.png', 'Power (Joules)', r.name.split('/')[-1])
-
-            graph.bar({zone: np.average(value) for zone, value in power_j_total.items()},
+        if plot_type == 'plot':
+            plot(power_j_total, x, f'{path}/power_j_total.png', 'Power (Joules)', r.name.split('/')[-1])
+        elif plot_type == 'bar':
+            bar({zone: np.average(value) for zone, value in power_j_total.items()},
                       f'{path}/power_j_overall_avg', f'Power (Joules, avg - {len(r.run_metrics)} runs)', 'RAPL Zone', r.name.split('/')[-1])
 
     print('Done')
 
 
 def _parse_input(_dir: str) -> dict:
-    return {_dir: util.parse_input_paths([_dir])}
+    return {_dir: parse_input_paths([_dir])}
 
