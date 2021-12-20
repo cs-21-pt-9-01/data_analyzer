@@ -18,12 +18,14 @@ parser.add_argument('--output', type=str,
 
 parser.add_argument('--title', type=str,
                     help='Title of the plot created', default='Default')
+parser.add_argument('--ymax', type=int,
+                    help='The Y-axis max', default=None)
 
 
 def run():
     args = parser.parse_args()
     if args.graph == 'grouped_barchart':
-        grouped_barchart_run(args.input, args.output, args.title)
+        grouped_barchart_run(args.input, args.output, args.title, args.ymax)
     elif args.graph == 'power_j_total':
         full_run(args.input, 'plot')
     elif args.graph == 'power_j_avg':

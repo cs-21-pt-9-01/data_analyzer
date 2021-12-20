@@ -36,7 +36,7 @@ def bar(data: dict, fp: str, ylabel: str, xlabel: str, title: str):
     plt.close(fig)
 
 
-def groupbar(data: dict, title: str, output_file: str):
+def groupbar(data: dict, title: str, output_file: str, ymax: int):
     column_order = ['package-0', 'core', 'uncore', 'dram']
     benchmarks = data['labels']
     max_index = len(benchmarks)
@@ -63,7 +63,8 @@ def groupbar(data: dict, title: str, output_file: str):
     ax.set_title(title)
     ax.set_xticks(x, benchmarks)
     ax.legend()
-    ax.set_ylim([0, 3000])
+    if ymax is not None:
+        ax.set_ylim([0, ymax])
 
     #for r in rects:
     #    ax.bar_label(r, padding=3)

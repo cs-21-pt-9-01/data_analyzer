@@ -11,12 +11,16 @@ def translate_name(name):
     return 'chocolate-doom (c)'
   elif name == 'crispy-doom':
     return 'crispy-doom (c)'
+  elif name == 'crispy-doom-opengl':
+    return 'crispy opengl (c)'
+  elif name == 'crispy-doom-software':
+    return 'crispy software (c)'
   elif name == 'eternity':
     return 'eternity (c++)'
   elif name == 'managed-doom':
     return 'managed-doom (c#)'
   elif name == 'mochadoom':
-    return 'mochadoom (java)'
+    return 'mochadoom'
   elif name == 'mochadoom-fix':
     return 'mochadoom CT+'
   elif name == 'prboom-opengl':
@@ -24,9 +28,10 @@ def translate_name(name):
   elif name == 'prboom-software' :
     return 'prboom+ software (c)'
   else:
+    print(f'WARNING: Found no match for "{name}"')
     return 'Unknown'
 
-def grouped_barchart_run(_input: str, output_file: str, title: str):
+def grouped_barchart_run(_input: str, output_file: str, title: str, ymax: int):
   overall_data = dict()
   for _d in os.listdir(_input):
     d = f'{_input}/{_d}'
@@ -80,7 +85,7 @@ def grouped_barchart_run(_input: str, output_file: str, title: str):
   data['labels'] = [translate_name(n) for n in data['labels']]
   import pprint
   pprint.pprint(data)
-  groupbar(data, title, output_file)
+  groupbar(data, title, output_file, ymax)
 
 
 def total_power_run(input, output_file):
