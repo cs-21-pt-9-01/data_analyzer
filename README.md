@@ -94,23 +94,23 @@ See `./sample/` for examples
 
 ## Commands used for the project
 The following commands were used in the project to generate the graphs:
+* For software based graphs (with frameratelimiter)
 ```bash
-python run.py --input ~/code/benchmark_data/data-software --graph grouped_barchart --output doom_software.png --title "Energy consumption with software rendering"
+python run.py --input ~/code/benchmark_data/data-software --graph grouped_barchart --output doom_software.png --title "Energy consumption with software rendering" --ymax 2000
+```
+* For softwared based graphs (with frameratelimiter)
+```bash
+python run.py --input ~/code/benchmark_data/data-software2 --graph grouped_barchart --output doom_software2.png --title "Energy consumption with software rendering" --ymax 500
 ```
 
 ```bash
-python run.py --input ~/code/benchmark_data/data-software2 --graph grouped_barchart --output doom_software2.png --title "Energy consumption with software rendering"
+python run.py --input ~/code/benchmark_data/data-uncapped --graph grouped_barchart --output doom_uncapped.png --title "Energy consumption with uncapped framelimiter" --ymax 2000
 ```
 
 ```bash
-python run.py --input ~/code/benchmark_data/data-uncapped --graph grouped_barchart --output doom_uncapped.png --title "Energy consumption with uncapped framelimiter"
+python run.py --input ~/code/benchmark_data/data-hardware --graph grouped_barchart --output doom_hardware.png --title "Energy consumption with hardware acceleration" --ymax 500
 ```
 
 ```bash
-python run.py --input ~/code/benchmark_data/data-hardware --graph grouped_barchart --output doom_hardware.png --title "Energy consum
-ption with hardware acceleration"
-```
-
-```bash
-python run.py --input ~/code/benchmark_data/mochadoom-fix-results --graph grouped_barchart --output mochadoom_fix.png --title "Energy consumption in mochadoom"
+python run.py --input ~/code/benchmark_data/data-mochadoom --graph grouped_barchart --output mochadoom_fix.png --title "Energy consumption in mochadoom" --ymax 2000
 ```

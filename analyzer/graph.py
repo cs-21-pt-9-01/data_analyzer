@@ -9,6 +9,10 @@ import numpy as np
 def translate_name(name):
   if name == 'chocolate-doom':
     return 'chocolate-doom (c)'
+  if name == 'chocolate-doom-software':
+    return 'chocolate software (c)'
+  if name == 'chocolate-doom-opengl':
+    return 'chocolate opengl (c)'
   elif name == 'crispy-doom':
     return 'crispy-doom (c)'
   elif name == 'crispy-doom-opengl':
