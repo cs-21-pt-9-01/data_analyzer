@@ -1,14 +1,13 @@
-from .graph import grouped_barchart_run, total_power_run, avg_power_run
-from .full import full_run
-
 from argparse import ArgumentParser
-import os
+
+from .full import full_run
+from .graph import grouped_barchart_run, total_power_run, avg_power_run
 
 parser = ArgumentParser(description="RAPL data analyzer")
 parser.add_argument('--input', metavar='file(s) | dir(s)', type=str,
                     help="Input file(s) and/or dir(s) containing RAPL data", required=True)
 
-graphs = ['grouped_barchart', 'power_j_total', 'power_j_avg']
+graphs = ['grouped_barchart', 'power_j_total', 'power_j_avg', 'power_curve']
 
 parser.add_argument('--graph', choices=graphs,
                     help="Name of the graph to output", required=True)
@@ -30,6 +29,7 @@ def run():
         full_run(args.input, 'plot')
     elif args.graph == 'power_j_avg':
         full_run(args.input, 'bar')
+    elif args.graph == 'power_curve':
+        full_run(args.input, 'curve')
     else:
         raise NotImplementedError(f'The method for the option "{args.graph}" is not implented')
-

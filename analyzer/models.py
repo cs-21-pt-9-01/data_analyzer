@@ -4,6 +4,7 @@ from typing import List, Callable, Optional, Dict
 import numpy as np
 
 VALID_ATTRS = ['power_j', 'watts', 'watts_since_last', 'watt_h', 'kwatt_h']
+DESIRED_ORDER = ['package-0', 'core', 'uncore', 'dram']
 
 
 class RAPLZoneRow:
@@ -63,7 +64,8 @@ class RAPLData:
         return {zone: [float(row.power_j) / 3600 for row in self.rows if row.zone == zone] for zone in self.get_zones()}
 
     def _kwatt_hours(self) -> dict:
-        return {zone: [float(row.power_j) / 3600 / 1000 for row in self.rows if row.zone == zone] for zone in self.get_zones()}
+        return {zone: [float(row.power_j) / 3600 / 1000 for row in self.rows if row.zone == zone] for zone in
+                self.get_zones()}
 
 
 class AnalyzedData:
@@ -82,17 +84,37 @@ class AnalyzedData:
             'run_data': [x.to_json() for x in self.run_data]
         }
 
-    def collect_metrics_by_zone(self, attr: str, metric: str) -> dict:
+    def collect_metrics_by_zone(self, rapl_data: str, attr: str, metric: str) -> dict:
+        if rapl_data == 'run_metrics':  # Used for Bar plot
+            return self.retrieve_data_from_list(self.run_metrics, attr, metric, True)
+        elif rapl_data == 'run_data':  # Used for Curve plot
+            return self.retrieve_data_from_list(self.run_data, attr, metric, False)
+
+    @staticmethod
+    def retrieve_data_from_list(metrics, attr: str, metric: str, is_data_dict: bool):
         res = {}
-        for m in self.run_metrics:
+        for m in metrics:
             attr_obj = getattr(m, attr)
-            metric_obj = getattr(attr_obj, metric)
+            # Is the data stored in a dictionary?
+            if is_data_dict:
+                metric_obj = getattr(attr_obj, metric)
+                # Reorder data for consistent graphs.
+                reordered_dict = {k: metric_obj[k] for k in DESIRED_ORDER}
+                for zone, value in reordered_dict.items():
+                    if zone not in res:
+                        res[zone] = []
 
-            for zone, value in metric_obj.items():
-                if zone not in res:
-                    res[zone] = []
+                    res[zone].append(value)
+            else:
+                # Reorder data for consistent graphs.
+                reordered_dict = {k: attr_obj[k] for k in DESIRED_ORDER}
+                for zone in reordered_dict.keys():
+                    metric_obj = reordered_dict.get(zone)
+                    for value in metric_obj:
+                        if zone not in res:
+                            res[zone] = []
 
-                res[zone].append(value)
+                        res[zone].append(value)
 
         return res
 

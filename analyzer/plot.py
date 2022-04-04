@@ -3,23 +3,32 @@ import numpy as np
 
 VALID_METRICS = ['min', 'max', 'median', 'avg', 'mean']
 GRAPH_TYPES = ['plot', 'bar']
+# Colors from previous project.
+ZONE_COLOR = {
+    'package-0': [31/255, 119/255, 180/255],
+    'core': 'orange',
+    'uncore': 'green',
+    'dram': 'red'
+}
 
 
-def plot(y: dict, x: list, fp: str, ylabel: str, title: str):
+def plot(chart: str, y: dict, x: list, fp: str, xlabel: str, ylabel: str, title: str):
     fig, ax = plt.subplots()
     generate_x = not bool(x)
-
     for zone, values in y.items():
         if generate_x:
             x = range(len(values))
-        ax.bar(x, values, label=zone)
+        if chart == 'plot':
+            ax.bar(x, values, label=zone, color=ZONE_COLOR.get(zone))
+        elif chart == 'curve':
+            ax.plot(x, values, label=zone, color=ZONE_COLOR.get(zone))
 
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * .8, box.height])
     ax.grid()
-    ax.set(xlabel='Benchmark no.', ylabel=ylabel, title=title)
+    ax.set(xlabel=xlabel, ylabel=ylabel, title=title)
 
-    legend = ax.legend(loc='lower left', bbox_to_anchor=(1, .8))
+    ax.legend(loc='lower left', bbox_to_anchor=(1, .8))
 
     plt.savefig(fp)
     plt.close(fig)
@@ -66,7 +75,7 @@ def groupbar(data: dict, title: str, output_file: str, ymax: int):
     if ymax is not None:
         ax.set_ylim([0, ymax])
 
-    #for r in rects:
+    # for r in rects:
     #    ax.bar_label(r, padding=3)
 
     fig.tight_layout()
