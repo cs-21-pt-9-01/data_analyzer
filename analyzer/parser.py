@@ -1,8 +1,7 @@
-from .models import RAPLData
-
 import os
 from typing import List
 
+from .models import RAPLData
 
 ALLOWED_FILE_TYPES = ['csv']
 
