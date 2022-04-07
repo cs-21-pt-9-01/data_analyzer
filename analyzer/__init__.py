@@ -26,10 +26,10 @@ def run():
     if args.graph == 'grouped_barchart':
         grouped_barchart_run(args.input, args.output, args.title, args.ymax)
     elif args.graph == 'power_j_total':
-        full_run(args.input, 'plot')
+        full_run(args.input, 'plot', args.output, args.title)
     elif args.graph == 'power_j_avg':
-        full_run(args.input, 'bar')
+        full_run(args.input, 'bar', args.output, args.title)
     elif args.graph == 'power_curve':
-        full_run(args.input, 'curve')
+        full_run(args.input, 'curve', args.output, args.title)
     else:
         raise NotImplementedError(f'The method for the option "{args.graph}" is not implented')
