@@ -25,24 +25,38 @@ class RAPLZoneRow:
 
 class RAPLData:
 
-    def __init__(self, path: str):
+    def __init__(self, path: str, xmin: int, xmax: int):
         self.path = path
         self.rows = []  # type: List[RAPLZoneRow]
-
+        self.xmin = xmin
+        self.xmax = xmax
+        self.rapl_zones = 4
         self._parse_csv()
 
     def _parse_csv(self):
         with open(self.path, 'r', newline='') as f:
             data = csv.reader(f, delimiter=',')
 
+            row_count = 0
             for row in data:
+                # Check if row should be skipped.
+                if self.xmin is not None:
+                    if row_count < self.xmin * self.rapl_zones:
+                        row_count += 1
+                        continue
+                # Check if we have reached max.
+                if self.xmax is not None:
+                    if row_count >= self.xmax * self.rapl_zones:
+                        return
                 # if row is headers
                 if row[0] == 'zone':
                     continue
                 # dont need initial measurement
                 if int(float(row[1])) == 0:
+                    row_count += 1
                     continue
                 self.rows.append(RAPLZoneRow(*row))
+                row_count += 1
 
     def get_field_as_dict(self, attr: str, _type: Callable = int) -> dict:
         if attr == 'watt_h':
@@ -84,37 +98,54 @@ class AnalyzedData:
             'run_data': [x.to_json() for x in self.run_data]
         }
 
-    def collect_metrics_by_zone(self, rapl_data: str, attr: str, metric: str) -> dict:
+    def collect_metrics_by_zone(self, rapl_data: str, attr: str, metric: str, key_prefix: str) -> dict:
         if rapl_data == 'run_metrics':  # Used for Bar plot
-            return self.retrieve_data_from_list(self.run_metrics, attr, metric, True)
+            return self.retrieve_data_from_list(self.run_metrics, attr, metric, key_prefix, True)
         elif rapl_data == 'run_data':  # Used for Curve plot
-            return self.retrieve_data_from_list(self.run_data, attr, metric, False)
+            return self.retrieve_data_from_list(self.run_data, attr, metric, key_prefix, False)
 
     @staticmethod
-    def retrieve_data_from_list(metrics, attr: str, metric: str, is_data_dict: bool):
+    def retrieve_data_from_list(metrics, attr: str, metric: str, key_prefix: str, is_data_dict: bool):
         res = {}
         for m in metrics:
             attr_obj = getattr(m, attr)
             # Is the data stored in a dictionary?
             if is_data_dict:
                 metric_obj = getattr(attr_obj, metric)
-                # Reorder data for consistent graphs.
-                reordered_dict = {k: metric_obj[k] for k in DESIRED_ORDER}
-                for zone, value in reordered_dict.items():
+                for zone, value in metric_obj.items():
                     if zone not in res:
                         res[zone] = []
 
                     res[zone].append(value)
             else:
-                # Reorder data for consistent graphs.
-                reordered_dict = {k: attr_obj[k] for k in DESIRED_ORDER}
-                for zone in reordered_dict.keys():
-                    metric_obj = reordered_dict.get(zone)
-                    for value in metric_obj:
-                        if zone not in res:
-                            res[zone] = []
+                # Collect data for all or a single metric
+                if metric is None:
+                    for zone in attr_obj.keys():
+                        metric_obj = attr_obj.get(zone)
+                        for value in metric_obj:
+                            if zone not in res:
+                                res[zone] = []
 
-                        res[zone].append(value)
+                            res[zone].append(value)
+                else:
+                    res[metric] = []
+                    res[metric] = attr_obj[metric]
+
+        if metric is None:
+            # Reorder data for consistent graphs.
+            reordered_dict = {k: res[k] for k in DESIRED_ORDER}
+            # Add prefix to key names.
+            if key_prefix != "":
+                renamed_dict = {key_prefix + key: reordered_dict[key] for key, value in reordered_dict.items()}
+                return renamed_dict
+
+            return reordered_dict
+        else:
+            # No dict to reorder due to only having 1 entry.
+            # Add prefix to key names.
+            if key_prefix != "":
+                renamed_dict = {key_prefix + key: res[key] for key, value in res.items()}
+                return renamed_dict
 
         return res
 

@@ -30,7 +30,7 @@ def plot(chart: str, y: dict, x: list, fp: str, xlabel: str, ylabel: str, title:
 
     ax.legend(loc='lower left', bbox_to_anchor=(1, .8))
 
-    plt.savefig(fp)
+    plt.savefig(fp, bbox_inches='tight')
     plt.close(fig)
 
 
