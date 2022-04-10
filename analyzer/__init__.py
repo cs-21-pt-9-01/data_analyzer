@@ -8,6 +8,7 @@ parser.add_argument('--input', metavar='file(s) | dir(s)', type=str,
                     help="Input file(s) and/or dir(s) containing RAPL data", required=True)
 
 graphs = ['grouped_barchart', 'power_j_total', 'power_j_avg', 'power_curve']
+graphs_requiring_attribute = ['power_j_total', 'power_j_avg', 'power_curve']
 VALID_RAPL_ZONE = ['package-0', 'core', 'uncore', 'dram']
 VALID_ATTRS = ['power_j', 'watts', 'watts_since_last', 'watt_h', 'kwatt_h']
 VALID_METRICS = ['avg', 'max', 'mean', 'median', 'min', 'total']
@@ -37,12 +38,15 @@ def run():
     args = parser.parse_args()
     if args.graph == 'grouped_barchart':
         grouped_barchart_run(args.input, args.output, args.title, args.ymax)
-    elif args.graph == 'power_j_total':
-        full_run(args.input, 'plot', args.output, args.title, args.attr, args.metric, args.xmin, args.xmax)
-    elif args.graph == 'power_j_avg':
-        full_run(args.input, 'bar', args.output, args.title, args.attr, args.metric, args.xmin, args.xmax)
-    elif args.graph == 'power_curve':
-        # 'power_curve' automatically plots multiple lines in a single graph when a dir is specified.
-        full_run(args.input, 'curve', args.output, args.title, args.attr, args.zone, args.xmin, args.xmax)
+    elif args.attr is not None:
+        if args.graph == 'power_j_total':
+            full_run(args.input, 'plot', args.output, args.title, args.attr, args.metric, args.xmin, args.xmax)
+        elif args.graph == 'power_j_avg':
+            full_run(args.input, 'bar', args.output, args.title, args.attr, args.metric, args.xmin, args.xmax)
+        elif args.graph == 'power_curve':
+            # 'power_curve' automatically plots multiple lines in a single graph when a dir is specified.
+            full_run(args.input, 'curve', args.output, args.title, args.attr, args.zone, args.xmin, args.xmax)
+    elif args.attr is None:
+        raise RuntimeError(f'Graphs of type, ' + str(graphs_requiring_attribute) + ' require the --attr argument.')
     else:
         raise NotImplementedError(f'The method for the option "{args.graph}" is not implented')
