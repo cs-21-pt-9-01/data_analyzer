@@ -257,3 +257,20 @@ class RAPLOverallMetrics:
             merged[m[0]] = {zone: m[1]([getattr(d, m[0])[zone] for d in data]) for zone in zones}
 
         return merged
+
+
+class DockerStatsRow:
+    def __init__(self, container_id: str, name: str, cpu: float, memory: float,
+                 memory_limit: float, memory_percentage: float, network_input: float,
+                 network_output: float, block_input: float, block_output: float, pids: int):
+        self.container_id = container_id
+        self.name = name
+        self.cpu = float(cpu)
+        self.memory = float(memory)
+        self.memory_limit = float(memory_limit)
+        self.memory_percentage = float(memory_percentage)
+        self.network_input = float(network_input)
+        self.network_output = float(network_output)
+        self.block_input = float(block_input)
+        self.block_output = float(block_output)
+        self.pids = int(pids)

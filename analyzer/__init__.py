@@ -2,12 +2,13 @@ from argparse import ArgumentParser
 
 from .full import full_run
 from .graph import grouped_barchart_run, total_power_run, avg_power_run
+from .docker_stats import docker_run
 
 parser = ArgumentParser(description="RAPL data analyzer")
 parser.add_argument('--input', metavar='file(s) | dir(s)', type=str,
                     help="Input file(s) and/or dir(s) containing RAPL data", required=True)
 
-graphs = ['grouped_barchart', 'power_j_total', 'power_j_avg', 'power_curve']
+graphs = ['grouped_barchart', 'power_j_total', 'power_j_avg', 'power_curve', 'docker_plot']
 graphs_requiring_attribute = ['power_j_total', 'power_j_avg', 'power_curve']
 VALID_RAPL_ZONE = ['package-0', 'core', 'uncore', 'dram']
 VALID_ATTRS = ['power_j', 'watts', 'watts_since_last', 'watt_h', 'kwatt_h']
@@ -38,6 +39,8 @@ def run():
     args = parser.parse_args()
     if args.graph == 'grouped_barchart':
         grouped_barchart_run(args.input, args.output, args.title, args.ymax)
+    elif args.graph == 'docker_plot':
+        docker_run(args.input, args.output, args.title)
     elif args.attr is not None:
         if args.graph == 'power_j_total':
             full_run(args.input, 'plot', args.output, args.title, args.attr, args.metric, args.xmin, args.xmax)

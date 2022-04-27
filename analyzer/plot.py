@@ -5,23 +5,30 @@ VALID_METRICS = ['min', 'max', 'median', 'avg', 'mean']
 GRAPH_TYPES = ['plot', 'bar']
 # Colors from previous project.
 ZONE_COLOR = {
-    'package-0': [31/255, 119/255, 180/255],
+    'package-0': [31 / 255, 119 / 255, 180 / 255],
     'core': 'orange',
     'uncore': 'green',
     'dram': 'red'
 }
 
 
-def plot(chart: str, y: dict, x: list, fp: str, xlabel: str, ylabel: str, title: str):
+def plot(chart: str, y: dict, x: list, fp: str, xlabel: str, ylabel: str, title: str, docker_stat=None):
     fig, ax = plt.subplots()
     generate_x = not bool(x)
-    for zone, values in y.items():
+
+    if docker_stat is None:
+        for zone, values in y.items():
+            if generate_x:
+                x = range(len(values))
+            if chart == 'plot':
+                ax.bar(x, values, label=zone, color=ZONE_COLOR.get(zone))
+            elif chart == 'curve':
+                if docker_stat is None:
+                    ax.plot(x, values, label=zone, color=ZONE_COLOR.get(zone))
+    else:
         if generate_x:
-            x = range(len(values))
-        if chart == 'plot':
-            ax.bar(x, values, label=zone, color=ZONE_COLOR.get(zone))
-        elif chart == 'curve':
-            ax.plot(x, values, label=zone, color=ZONE_COLOR.get(zone))
+            x = range(len(y[docker_stat]))
+        ax.plot(x, y[docker_stat], label=docker_stat.upper())
 
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * .8, box.height])
