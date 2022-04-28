@@ -1,8 +1,7 @@
 from analyzer.models import DockerStatsRow
 import csv
 import re
-# import pandas as pd
-from .plot import plot
+from .plot import docker_plot
 import os
 
 
@@ -19,10 +18,6 @@ def parse_stats_row(row):
     row[8] = re.sub('[a-z]', '', row[8].lower())
     row[9] = re.sub('[a-z]', '', row[9].lower())
     return row
-
-
-def remove_outlier(dataFrame, col_name='cpu', threshold=100):
-    return dataFrame[dataFrame[col_name] > threshold]
 
 
 def initialize_dict(values):
@@ -84,14 +79,11 @@ def docker_run(_dir: str, output: str, title: str):
         values["pids"].append(docker_row.pids)
         previous_cpu_value = float(row[2])
 
-    # df = remove_outlier(pd.DataFrame(data=values), threshold=0)
-    # values = df.to_dict("list")
-
     print("Outliers: " + str(skip_counter))
 
     path = f'{os.path.dirname(_dir)}/processed'
     if not os.path.isdir(path):
         os.makedirs(path)
-    plot("curve", values, [], f"{path}/{output}", "Time (seconds)",
-         "CPU usage", f"{title}", docker_stat="cpu")
+    docker_plot(values, f"{path}/{output}", "Time (seconds)",
+                "CPU usage (%)", f"{title}", docker_stat="cpu")
     print('Done')

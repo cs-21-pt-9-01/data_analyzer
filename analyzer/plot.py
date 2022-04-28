@@ -12,33 +12,54 @@ ZONE_COLOR = {
 }
 
 
-def plot(chart: str, y: dict, x: list, fp: str, xlabel: str, ylabel: str, title: str, docker_stat=None):
+def plot(chart: str, y: dict, x: list, fp: str, xlabel: str, ylabel: str, title: str):
     fig, ax = plt.subplots()
     generate_x = not bool(x)
 
-    if docker_stat is None:
-        for zone, values in y.items():
-            if generate_x:
-                x = range(len(values))
-            if chart == 'plot':
-                ax.bar(x, values, label=zone, color=ZONE_COLOR.get(zone))
-            elif chart == 'curve':
-                if docker_stat is None:
-                    ax.plot(x, values, label=zone, color=ZONE_COLOR.get(zone))
-    else:
+    for zone, values in y.items():
         if generate_x:
-            x = range(len(y[docker_stat]))
-        ax.plot(x, y[docker_stat], label=docker_stat.upper())
+            x = range(len(values))
+        if chart == 'plot':
+            ax.bar(x, values, label=zone, color=ZONE_COLOR.get(zone))
+        elif chart == 'curve':
+            ax.plot(x, values, label=zone, color=ZONE_COLOR.get(zone))
 
+    ax.grid()
+    create_plot(ax, xlabel, ylabel, title, fp, fig)
+
+
+def create_plot(ax, xlabel, ylabel, title, fp, fig):
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * .8, box.height])
-    ax.grid()
     ax.set(xlabel=xlabel, ylabel=ylabel, title=title)
 
     ax.legend(loc='lower left', bbox_to_anchor=(1, .8))
 
     plt.savefig(fp, bbox_inches='tight')
     plt.close(fig)
+
+
+def docker_plot(y: dict, fp: str, xlabel: str, ylabel: str, title: str, docker_stat: str):
+    fig, ax = plt.subplots()
+    # Create x-coordinates.
+    # This is sufficient as docker stats are collected every 2 seconds.
+    x = range(0, len(y[docker_stat]) * 2, 2)
+    ax.plot(x, y[docker_stat], label=docker_stat.upper(), linewidth=1)
+
+    # Hide grid lines
+    ax.grid(False)
+    # Add vertical lines marking the increase in thread count.
+    idle_time = 450
+    vertical_line_coordinates = range(0 + idle_time, len(y[docker_stat]) * 2 - idle_time, 450)
+    for coordinate in vertical_line_coordinates:
+        ax.axvline(x=coordinate, color="purple", ls=":")
+
+    # Set x-axis interval to 450
+    ax.xaxis.set_ticks(np.arange(0, len(y[docker_stat]) * 3, 450))
+
+    # Stretch out figure
+    fig.set_size_inches(18.5, 10.5)
+    create_plot(ax, xlabel, ylabel, title, fp, fig)
 
 
 def bar(data: dict, fp: str, ylabel: str, xlabel: str, title: str):
