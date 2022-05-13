@@ -12,7 +12,7 @@ ZONE_COLOR = {
 }
 
 
-def plot(chart: str, y: dict, x: list, fp: str, xlabel: str, ylabel: str, title: str):
+def plot(chart: str, y: dict, x: list, fp: str, xlabel: str, ylabel: str, title: str, ymax: int):
     fig, ax = plt.subplots()
     generate_x = not bool(x)
 
@@ -39,10 +39,12 @@ def plot(chart: str, y: dict, x: list, fp: str, xlabel: str, ylabel: str, title:
             fig.set_size_inches(18.5, 10.5)
 
     ax.grid()
-    create_plot(ax, xlabel, ylabel, title, fp, fig)
+    create_plot(ax, xlabel, ylabel, title, fp, fig, ymax)
 
 
-def create_plot(ax, xlabel, ylabel, title, fp, fig):
+def create_plot(ax, xlabel, ylabel, title, fp, fig, ymax):
+    if ymax is not None:
+        ax.set_ylim([0, ymax])
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * .8, box.height])
     ax.set(xlabel=xlabel, ylabel=ylabel, title=title)

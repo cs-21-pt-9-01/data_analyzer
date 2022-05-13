@@ -46,12 +46,12 @@ def run():
         micro_docker_run(args.input, args.output, args.title)
     elif args.attr is not None:
         if args.graph == 'power_j_total':
-            full_run(args.input, 'plot', args.output, args.title, args.attr, args.metric, args.xmin, args.xmax)
+            full_run(args.input, 'plot', args.output, args.title, args.attr, args.metric, args.xmin, args.xmax, args.ymax)
         elif args.graph == 'power_j_avg':
-            full_run(args.input, 'bar', args.output, args.title, args.attr, args.metric, args.xmin, args.xmax)
+            full_run(args.input, 'bar', args.output, args.title, args.attr, args.metric, args.xmin, args.xmax, args.ymax)
         elif args.graph == 'power_curve':
             # 'power_curve' automatically plots multiple lines in a single graph when a dir is specified.
-            full_run(args.input, 'curve', args.output, args.title, args.attr, args.zone, args.xmin, args.xmax)
+            full_run(args.input, 'curve', args.output, args.title, args.attr, args.zone, args.xmin, args.xmax, args.ymax)
     elif args.attr is None:
         raise RuntimeError(f'Graphs of type, ' + str(graphs_requiring_attribute) + ' require the --attr argument.')
     else:

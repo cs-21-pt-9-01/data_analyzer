@@ -9,12 +9,12 @@ from .plot import plot, bar
 
 
 def full_run(_dir: str, plot_type: str, output: str, title: str, rapl_attr: str, zone_or_metric: str,
-             xmin: int, xmax: int):
+             xmin: int, xmax: int, ymax: int):
     if os.path.isdir(_dir):
         power_j_total = {}
         for _d in os.listdir(_dir):
             d = f'{_dir}/{_d}'
-            temp = plot_run(d, _dir, plot_type, output, title, rapl_attr, zone_or_metric, xmin, xmax)
+            temp = plot_run(d, _dir, plot_type, output, title, rapl_attr, zone_or_metric, xmin, xmax, ymax)
 
             # Don't update if we don't use it later.
             if plot_type == 'curve':
@@ -25,15 +25,15 @@ def full_run(_dir: str, plot_type: str, output: str, title: str, rapl_attr: str,
         if plot_type == 'curve':
             path = f'{_dir}/processed'
             plot(plot_type, power_j_total, [], f'{path}/{output}', 'Time (seconds)',
-                 'Power (Watts) since previous measurement', f'{title}')
+                 'Power (Watts) since previous measurement', f'{title}', ymax)
     else:
         d = _dir
         power_j_total = plot_run(d, os.path.dirname(_dir), plot_type, output, title, rapl_attr, zone_or_metric,
-                                 xmin, xmax)
+                                 xmin, xmax, ymax)
         if plot_type == 'curve':
             path = f'{os.path.dirname(_dir)}/processed'
             plot(plot_type, power_j_total, [], f'{path}/{output}', 'Time (seconds)',
-                 'Power (Watts) since previous measurement', f'{title}')
+                 'Power (Watts) since previous measurement', f'{title}', ymax)
     print('Done')
 
 
@@ -42,7 +42,7 @@ def _parse_input(_dir: str, xmin: int, xmax: int) -> dict:
 
 
 def plot_run(d, _dir, plot_type: str, output: str, title: str, rapl_attr: str, zone_or_metric: str,
-             xmin: int, xmax: int):
+             xmin: int, xmax: int, ymax: int):
     data = _parse_input(d, xmin, xmax)
 
     # Skip if no data was retrieved.
@@ -78,7 +78,7 @@ def plot_run(d, _dir, plot_type: str, output: str, title: str, rapl_attr: str, z
 
         if plot_type == 'plot':
             plot(plot_type, power_j_total, x, f'{path}/{output}', 'Benchmark no.', 'Power (Joules)',
-                 f'{output}')
+                 f'{output}', ymax)
         elif plot_type == 'bar':
             bar({zone: np.average(value) for zone, value in power_j_total.items()},
                 f'{path}/{output}', f'Power (Joules, avg - {len(r.run_metrics)} runs)', 'RAPL Zone',
