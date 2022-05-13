@@ -269,8 +269,8 @@ class DockerStatsRow:
         self.memory = float(memory)
         self.memory_limit = float(memory_limit)
         self.memory_percentage = float(memory_percentage)
-        self.network_input = float(network_input)
-        self.network_output = float(network_output)
-        self.block_input = float(block_input)
-        self.block_output = float(block_output)
+        self.network_input = network_input
+        self.network_output = network_output
+        self.block_input = block_input
+        self.block_output = block_output
         self.pids = int(pids)

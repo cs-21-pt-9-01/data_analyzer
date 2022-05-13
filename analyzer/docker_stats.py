@@ -41,11 +41,11 @@ def docker_run(_dir: str, output: str, title: str):
     with open(_dir, 'r', newline='\n') as f:
         reader = csv.reader((','.join(line.split()) for line in f if "CONTAINER" not in line), delimiter=',')
         data = list(reader)
-        total_row_count = reader.line_num
+        # total_row_count = reader.line_num
 
     values = {}
     first_row = True
-    previous_cpu_value = 0
+    # previous_cpu_value = 0
     skip_counter = 0
     current_row_counter = 0
 
@@ -59,10 +59,10 @@ def docker_run(_dir: str, output: str, title: str):
 
         # Skip outliers.
         # Outliers = sudden drop of 100% in CPU usage
-        if float(row[2]) < (previous_cpu_value - 100):
-            if not current_row_counter > (total_row_count - skip_counter):
-                skip_counter += 1
-                continue
+        # if float(row[2]) < (previous_cpu_value - 100):
+        #    if not current_row_counter > (total_row_count - skip_counter):
+        #        skip_counter += 1
+        #        continue
 
         # Add values to lists
         docker_row = DockerStatsRow(*row)
@@ -77,7 +77,7 @@ def docker_run(_dir: str, output: str, title: str):
         values["block_input"].append(docker_row.block_input)
         values["block_output"].append(docker_row.block_output)
         values["pids"].append(docker_row.pids)
-        previous_cpu_value = float(row[2])
+        # previous_cpu_value = float(row[2])
 
     print("Outliers: " + str(skip_counter))
 
@@ -85,5 +85,5 @@ def docker_run(_dir: str, output: str, title: str):
     if not os.path.isdir(path):
         os.makedirs(path)
     docker_plot(values, f"{path}/{output}", "Time (seconds)",
-                "CPU usage (%)", f"{title}", docker_stat="cpu")
+                "CPU usage (%)", f"{title}", "cpu", None)
     print('Done')

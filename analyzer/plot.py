@@ -22,7 +22,21 @@ def plot(chart: str, y: dict, x: list, fp: str, xlabel: str, ylabel: str, title:
         if chart == 'plot':
             ax.bar(x, values, label=zone, color=ZONE_COLOR.get(zone))
         elif chart == 'curve':
-            ax.plot(x, values, label=zone, color=ZONE_COLOR.get(zone))
+            ax.plot(x, values, label=zone, color=ZONE_COLOR.get(zone), linewidth=1)
+
+            # Hide grid lines
+            ax.grid(False)
+            # Add vertical lines marking the increase in thread count.
+            idle_time = 450
+            vertical_line_coordinates = range(0 + idle_time, len(values) - idle_time, 450)
+            for coordinate in vertical_line_coordinates:
+                ax.axvline(x=coordinate, color="purple", ls=":")
+
+            # Set x-axis interval to 450
+            ax.xaxis.set_ticks(np.arange(0, len(values), 450))
+
+            # Stretch out figure
+            fig.set_size_inches(18.5, 10.5)
 
     ax.grid()
     create_plot(ax, xlabel, ylabel, title, fp, fig)
@@ -39,12 +53,16 @@ def create_plot(ax, xlabel, ylabel, title, fp, fig):
     plt.close(fig)
 
 
-def docker_plot(y: dict, fp: str, xlabel: str, ylabel: str, title: str, docker_stat: str):
+def docker_plot(y: dict, fp: str, xlabel: str, ylabel: str, title: str, docker_stat: str, values: dict):
     fig, ax = plt.subplots()
     # Create x-coordinates.
     # This is sufficient as docker stats are collected every 2 seconds.
     x = range(0, len(y[docker_stat]) * 2, 2)
-    ax.plot(x, y[docker_stat], label=docker_stat.upper(), linewidth=1)
+    if values is not None:
+        for value in values:
+            ax.plot(x, values[value][docker_stat], label=value + "-" + docker_stat.upper(), linewidth=1)
+    else:
+        ax.plot(x, y[docker_stat], label=docker_stat.upper(), linewidth=1)
 
     # Hide grid lines
     ax.grid(False)
@@ -55,11 +73,11 @@ def docker_plot(y: dict, fp: str, xlabel: str, ylabel: str, title: str, docker_s
         ax.axvline(x=coordinate, color="purple", ls=":")
 
     # Set x-axis interval to 450
-    ax.xaxis.set_ticks(np.arange(0, len(y[docker_stat]) * 3, 450))
+    ax.xaxis.set_ticks(np.arange(0, len(y[docker_stat]) * 2, 450))
 
     # Stretch out figure
     fig.set_size_inches(18.5, 10.5)
-    create_plot(ax, xlabel, ylabel, title, fp, fig)
+    create_plot(ax, xlabel, ylabel, title, fp, fig, None)
 
 
 def bar(data: dict, fp: str, ylabel: str, xlabel: str, title: str):
